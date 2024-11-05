@@ -123,7 +123,6 @@ dist
 /.config
 /coverage/
 /InstalledFiles
-/pkg/
 /spec/reports/
 /spec/examples.txt
 /test/tmp/
@@ -139,7 +138,7 @@ dist
 ## Specific to RubyMotion:
 .dat*
 .repl_history
-build/
+# build/
 *.bridgesupport
 build-iPhoneOS/
 build-iPhoneSimulator/
@@ -195,7 +194,7 @@ build-iPhoneSimulator/
 *.dll
 
 # Fortran module files
-*.mod
+# *.mod
 *.smod
 
 # Compiled Static libraries
@@ -211,7 +210,7 @@ build-iPhoneSimulator/
 
 ### Gradle template
 .gradle
-**/build/
+# **/build/
 !src/**/build/
 
 # Ignore Gradle GUI config
@@ -356,7 +355,7 @@ local.properties
 *.pdb
 
 # Kernel Module Compile Results
-*.mod*
+# *.mod*
 *.cmd
 .tmp_versions/
 modules.order
@@ -1196,7 +1195,7 @@ FodyWeavers.xsd
 [Ll]ib
 [Ll]ib64
 [Ll]ocal
-[Ss]cripts
+#[Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
 
@@ -1234,3 +1233,5 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+
+allure-results

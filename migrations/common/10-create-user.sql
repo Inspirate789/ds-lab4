@@ -1,0 +1,2 @@
+CREATE ROLE program WITH PASSWORD 'test';
+ALTER ROLE program WITH LOGIN;

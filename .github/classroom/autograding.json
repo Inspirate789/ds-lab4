@@ -3,7 +3,7 @@
     {
       "name": "Run Postman",
       "setup": "",
-      "run": "newman run -e <variant>/postman/environment.json <variant>/postman/collection.json",
+      "run": "newman run -e postman/environment.json postman/collection.json",
       "input": "",
       "output": "",
       "comparison": "included",
