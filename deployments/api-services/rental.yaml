@@ -2,7 +2,7 @@
 applicationName: rental-api
 
 containerImage:
-  repository: inspirate789/ds-rental-api
+  repository: ds-labs.cr.cloud.ru/ds-rental-api
   tag: latest
   pullPolicy: Always
 

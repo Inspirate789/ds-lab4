@@ -154,8 +154,45 @@ jobs:
         timeout-minutes: 10
         run: docker compose down --volumes
 
-  deploy:
+  push_images:
     needs: [ api_test ]
+    name: Push images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU for Docker build
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build images
+        timeout-minutes: 10
+        run: docker compose build
+
+      - name: Login to docker registry
+        run: docker login -u ${{ secrets.CLOUD_RU_LOGIN }} -p ${{ secrets.CLOUD_RU_PASSWORD }} ds-labs.cr.cloud.ru
+
+      - name: Tag images
+        run: |
+          docker tag inspirate789/ds-cars-api:latest ds-labs.cr.cloud.ru/ds-cars-api:latest
+          docker tag inspirate789/ds-gateway:latest ds-labs.cr.cloud.ru/ds-gateway:latest
+          docker tag inspirate789/ds-rental-api:latest ds-labs.cr.cloud.ru/ds-rental-api:latest
+          docker tag inspirate789/ds-payment-api:latest ds-labs.cr.cloud.ru/ds-payment-api:latest
+          docker tag inspirate789/ds-retryer:latest ds-labs.cr.cloud.ru/ds-retryer:latest
+
+      - name: Push images
+        run: |  
+          docker push ds-labs.cr.cloud.ru/ds-cars-api:latest
+          docker push ds-labs.cr.cloud.ru/ds-gateway:latest
+          docker push ds-labs.cr.cloud.ru/ds-rental-api:latest
+          docker push ds-labs.cr.cloud.ru/ds-payment-api:latest
+          docker push ds-labs.cr.cloud.ru/ds-retryer:latest
+
+  deploy:
+    needs: [ push_images ]
     name: Deploy to k8s
     runs-on: ubuntu-latest
     steps:
@@ -172,13 +209,13 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v3
         with:
           exec: |
-            helm upgrade postgres oci://registry-1.docker.io/bitnamicharts/postgresql -f deployments/postgres/values.yaml --install --wait --atomic --timeout 15m0s
-            helm upgrade kafka oci://registry-1.docker.io/bitnamicharts/kafka -f deployments/kafka/values.yaml --install --wait --atomic --timeout 15m0s
+            helm upgrade postgres oci://registry-1.docker.io/bitnamicharts/postgresql -f deployments/postgres/values.yaml --install --wait --atomic
+            helm upgrade kafka oci://registry-1.docker.io/bitnamicharts/kafka -f deployments/kafka/values.yaml --install --wait --atomic
             helm repo add gruntwork https://helmcharts.gruntwork.io
             helm repo update
-            helm upgrade cars-api gruntwork/k8s-service -f deployments/api-services/cars.yaml --install --wait --atomic --timeout 15m0s
-            helm upgrade rental-api gruntwork/k8s-service -f deployments/api-services/rental.yaml --install --wait --atomic --timeout 15m0s
-            helm upgrade payment-api gruntwork/k8s-service -f deployments/api-services/payment.yaml --install --wait --atomic --timeout 15m0s
-            helm upgrade gateway gruntwork/k8s-service -f deployments/api-services/gateway.yaml --install --wait --atomic --timeout 15m0s
+            helm upgrade cars-api gruntwork/k8s-service -f deployments/api-services/cars.yaml --install --wait --atomic
+            helm upgrade rental-api gruntwork/k8s-service -f deployments/api-services/rental.yaml --install --wait --atomic
+            helm upgrade payment-api gruntwork/k8s-service -f deployments/api-services/payment.yaml --install --wait --atomic
+            helm upgrade gateway gruntwork/k8s-service -f deployments/api-services/gateway.yaml --install --wait --atomic
           kubeconfig: '${{ secrets.KUBECONFIG }}'
           overrule_existing_kubeconfig: "true"

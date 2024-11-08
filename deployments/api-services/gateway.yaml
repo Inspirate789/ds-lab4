@@ -2,7 +2,7 @@
 applicationName: gateway
 
 containerImage:
-  repository: inspirate789/ds-gateway
+  repository: ds-labs.cr.cloud.ru/ds-gateway
   tag: latest
   pullPolicy: Always
 

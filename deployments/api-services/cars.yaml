@@ -2,7 +2,7 @@
 applicationName: cars-api
 
 containerImage:
-  repository: inspirate789/ds-cars-api
+  repository: ds-labs.cr.cloud.ru/ds-cars-api
   tag: latest
   pullPolicy: Always
 
