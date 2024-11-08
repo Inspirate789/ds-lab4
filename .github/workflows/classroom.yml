@@ -159,7 +159,15 @@ jobs:
     name: Deploy to k8s
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cloudlogin (for cloud.ru)
+        run: |
+          wget https://github.com/cloud-ru-tech/cloudlogin/releases/download/v1.0.0/cloudlogin_Linux_amd64.tar.gz
+          tar -xzf cloudlogin_Linux_amd64.tar.gz
+          mv cloudlogin /usr/local/bin/
+
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v3
         with:
