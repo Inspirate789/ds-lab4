@@ -36,7 +36,7 @@ services:
       args:
         MAIN_PATH: ./cmd/retryer/main.go
         CONFIG_PATH: ./configs/retryer.yaml
-        PIPELINE_ID: ${PIPELINE_ID}
+        PIPELINE_ID: ${PIPELINE_ID:-0}
         MODE: without_migrations
       platforms:
         - "linux/amd64"
@@ -49,7 +49,7 @@ services:
       args:
         MAIN_PATH: ./cmd/gateway/main.go
         CONFIG_PATH: ./configs/gateway.yaml
-        PIPELINE_ID: ${PIPELINE_ID}
+        PIPELINE_ID: ${PIPELINE_ID:-0}
         MODE: without_migrations
       platforms:
         - "linux/amd64"
@@ -65,7 +65,7 @@ services:
         MAIN_PATH: ./cmd/car/main.go
         CONFIG_PATH: ./configs/cars.yaml
         MIGRATIONS_FOLDER: ./migrations/car
-        PIPELINE_ID: ${PIPELINE_ID}
+        PIPELINE_ID: ${PIPELINE_ID:-0}
       platforms:
         - "linux/amd64"
     image: inspirate789/ds-cars-api:latest
@@ -80,7 +80,7 @@ services:
         MAIN_PATH: ./cmd/rental/main.go
         CONFIG_PATH: ./configs/rental.yaml
         MIGRATIONS_FOLDER: ./migrations/rental
-        PIPELINE_ID: ${PIPELINE_ID}
+        PIPELINE_ID: ${PIPELINE_ID:-0}
       platforms:
         - "linux/amd64"
     image: inspirate789/ds-rental-api:latest
@@ -95,7 +95,7 @@ services:
         MAIN_PATH: ./cmd/payment/main.go
         CONFIG_PATH: ./configs/payment.yaml
         MIGRATIONS_FOLDER: ./migrations/payment
-        PIPELINE_ID: ${PIPELINE_ID}
+        PIPELINE_ID: ${PIPELINE_ID:-0}
       platforms:
         - "linux/amd64"
     image: inspirate789/ds-payment-api:latest
