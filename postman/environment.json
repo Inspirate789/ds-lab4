@@ -4,7 +4,7 @@
 	"values": [
 		{
 			"key": "baseUrl",
-			"value": "http://aboba.k8s.orb.local",
+			"value": "http://localhost:8080",
 			"enabled": true
 		}
 	],
