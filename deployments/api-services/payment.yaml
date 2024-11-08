@@ -1,0 +1,42 @@
+---
+applicationName: payment-api
+
+containerImage:
+  repository: inspirate789/ds-payment-api
+  tag: latest
+  pullPolicy: Always
+
+containerPorts:
+  http:
+    port: 80
+    protocol: TCP
+
+startupProbe:
+  httpGet:
+    path: /manage/health
+    port: http
+  failureThreshold: 30
+  periodSeconds: 3
+
+livenessProbe:
+  httpGet:
+    path: /manage/health
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /manage/health
+    port: http
+
+lifecycleHooks:
+  enabled: false
+
+replicaCount: 1
+
+service:
+  enabled: true
+  ports:
+    app:
+      port: 80
+      targetPort: http
+      protocol: TCP

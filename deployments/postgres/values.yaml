@@ -1,0 +1,23 @@
+fullnameOverride: postgres
+global:
+  postgresql:
+    auth:
+      postgresPassword: "aboba"
+primary:
+  initdb:
+    scripts:
+      10-create-user-and-databases.sh: |
+        export PGPASSWORD=aboba
+        psql -c "CREATE ROLE program WITH PASSWORD 'test';"
+        psql -c "ALTER ROLE program WITH LOGIN;"
+        psql -c "CREATE DATABASE cars;"
+        psql -c "GRANT CREATE ON DATABASE cars TO program;"
+        psql -c "CREATE DATABASE rentals;"
+        psql -c "GRANT ALL ON DATABASE rentals TO program;"
+        psql -c "CREATE DATABASE payments;"
+        psql -c "GRANT ALL ON DATABASE payments TO program;"
+        psql -d cars -c "GRANT ALL ON SCHEMA public TO program;"
+        psql -d rentals -c "GRANT ALL ON SCHEMA public TO program;"
+        psql -d payments -c "GRANT ALL ON SCHEMA public TO program;"
+image:
+  debug: true
