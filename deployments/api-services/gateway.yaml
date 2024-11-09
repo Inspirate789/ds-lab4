@@ -48,13 +48,8 @@ ingress:
   pathType: Prefix
   servicePort: app
 
-configMaps:
-  gateway-k8s-config:
-    as: volume
-    mountPath: /cgg/app.yaml
-    subPath: app.yaml
-
 envVars:
+  WEB_PORT: 80
   carsApiAddr: "http://cars-api"
   rentalApiAddr: "http://rental-api"
   paymentApiAddr: "http://payment-api"

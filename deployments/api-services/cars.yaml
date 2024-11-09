@@ -40,3 +40,6 @@ service:
       port: 80
       targetPort: http
       protocol: TCP
+
+envVars:
+  WEB_PORT: 80
