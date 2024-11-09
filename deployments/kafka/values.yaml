@@ -1,2 +1,5 @@
+image:
+  registry: ds-labs.cr.cloud.ru
+  repository: kafka
 extraInit: |
   kafka_conf_set "$KAFKA_CONFIG_FILE" "auto.create.topics.enable" "true"

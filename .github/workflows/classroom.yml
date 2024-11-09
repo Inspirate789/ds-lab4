@@ -125,10 +125,6 @@ jobs:
           delayRequest: 100
           reporters: '[ "cli" ]'
 
-      - uses: education/autograding@v1
-        id: autograder
-        continue-on-error: true
-
       - name: Cat gateway logs
         if: failure()
         run: docker logs gateway
@@ -184,6 +180,7 @@ jobs:
           docker tag inspirate789/ds-retryer:latest ds-labs.cr.cloud.ru/ds-retryer:latest
 
       - name: Push images
+        timeout-minutes: 10
         run: |  
           docker push ds-labs.cr.cloud.ru/ds-cars-api:latest
           docker push ds-labs.cr.cloud.ru/ds-gateway:latest
@@ -219,3 +216,24 @@ jobs:
             helm upgrade gateway gruntwork/k8s-service -f deployments/api-services/gateway.yaml --install --wait --atomic
           kubeconfig: '${{ secrets.KUBECONFIG }}'
           overrule_existing_kubeconfig: "true"
+
+  autograding:
+    needs: [ deploy ]
+    name: Autograding
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add app URL to Postman environment
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: >-
+            jq '.values[0].value = "http://${{ secrets.PROD_HOST }}:${{ secrets.PROD_PORT }}"'
+            < postman/environment.json > out.tmp &&
+            mv out.tmp postman/environment.json
+
+      - name: Autograding
+        uses: education/autograding@v1
+        continue-on-error: true

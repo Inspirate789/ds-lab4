@@ -20,4 +20,6 @@ primary:
         psql -d rentals -c "GRANT ALL ON SCHEMA public TO program;"
         psql -d payments -c "GRANT ALL ON SCHEMA public TO program;"
 image:
+  registry: ds-labs.cr.cloud.ru
+  repository: postgres
   debug: true
