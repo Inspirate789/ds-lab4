@@ -2,9 +2,8 @@
 
 set -e
 
-variant=${1:-${VARIANT}}
-deployment=${2:-${DEPLOYMENT_NAME}}
-namespace=${3:-${NAMESPACE}}
+deployment=${1:-${DEPLOYMENT_NAME}}
+namespace=${2:-${NAMESPACE}}
 
 [[ -z $namespace ]] && namespace="default"
 
@@ -27,9 +26,9 @@ success() {
   newman run \
     --delay-request=100 \
     --folder=success \
-    --export-environment "$variant"/postman/environment.json \
-    --environment "$variant"/postman/environment.json \
-    "$variant"/postman/collection.json
+    --export-environment postman/environment.json \
+    --environment postman/environment.json \
+    postman/collection.json
 }
 
 step() {
@@ -43,9 +42,9 @@ step() {
   newman run \
     --delay-request=100 \
     --folder=step"$step" \
-    --export-environment "$variant"/postman/environment.json \
-    --environment "$variant"/postman/environment.json \
-    "$variant"/postman/collection.json
+    --export-environment postman/environment.json \
+    --environment postman/environment.json \
+    postman/collection.json
 
   printf "=== Step %d completed ===\n" "$step"
 }
@@ -58,14 +57,14 @@ printf "=== Start test scenario ===\n"
 # success execute
 success
 
-# stop service
+# stop deployment
 step 1
 
-# start service
+# start deployment
 step 2
 
-# stop service
+# stop deployment
 step 3
 
-# start service
+# start deployment
 step 4

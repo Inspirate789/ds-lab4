@@ -1,0 +1,9 @@
+logging:
+  level: -4 # -4: debug, 0: info, 4: warn, 8: error
+web:
+  host:
+  port: 8080
+  pathPrefix: /api/v1/cars
+db:
+  driverName: postgres
+  connectionString: postgres://program:test@postgres:5432/cars?sslmode=disable

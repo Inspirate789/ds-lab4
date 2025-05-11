@@ -3,7 +3,7 @@
     {
       "name": "Run Test Script",
       "setup": "",
-      "run": "./scripts/test-script.sh <variant> <deployment> <k8s namespace>",
+      "run": "./scripts/test-script.sh payment-api test",
       "input": "",
       "output": "",
       "comparison": "included",

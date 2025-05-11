@@ -1,0 +1,49 @@
+{
+  "_": {
+    "postman_variable_scope": "environment",
+    "postman_exported_at": "2025-05-10T20:20:36.342Z",
+    "postman_exported_using": "Newman/6.2.1"
+  },
+  "id": "a7ec827a-303f-4fad-972e-ee60c7b66efe",
+  "name": "[rsoi][local] Car Rental System",
+  "values": [
+    {
+      "type": "any",
+      "value": "http://gateway.default.svc.cluster.local",
+      "key": "baseUrl"
+    },
+    {
+      "type": "any",
+      "value": "109b42f3-198d-4c89-9276-a7520a7120ab",
+      "key": "carUid"
+    },
+    {
+      "type": "any",
+      "value": "Test Max",
+      "key": "username"
+    },
+    {
+      "type": "any",
+      "value": 3500,
+      "key": "rentalPrice"
+    },
+    {
+      "type": "any",
+      "value": "2021-10-08",
+      "key": "dateFrom"
+    },
+    {
+      "type": "any",
+      "value": "2021-10-11",
+      "key": "dateTo"
+    },
+    {
+      "type": "any",
+      "value": "0c96c5da-71f9-48db-8de7-4789cc7f6c30",
+      "key": "rentalUid"
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2025-05-10T20:21:06.957Z",
+  "_postman_exported_using": "Newman/6.2.1"
+}

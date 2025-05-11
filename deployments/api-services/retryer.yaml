@@ -1,0 +1,12 @@
+---
+applicationName: retryer
+
+containerImage:
+  repository: inspirate789/ds-retryer
+  tag: latest
+  pullPolicy: Always
+
+lifecycleHooks:
+  enabled: false
+
+replicaCount: 1

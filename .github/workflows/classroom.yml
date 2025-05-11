@@ -1,35 +1,169 @@
 name: GitHub Classroom Workflow
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
 jobs:
   build:
-    name: Autograding
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Golang
+        uses: actions/setup-go@v5
         with:
-          fetch-depth: 0
+          go-version: '1.23.1'
 
-      - uses: docker/setup-buildx-action@v2
+      - name: Install app dependencies
+        run: go mod tidy
 
-      # TODO build and run unit tests
+      - name: Build gateway
+        run: go build -v ./cmd/gateway/main.go
 
-      - name: Build images
+      - name: Build cars service
+        run: go build -v ./cmd/car/main.go
+
+      - name: Build rental service
+        run: go build -v ./cmd/car/main.go
+
+      - name: Build payment service
+        run: go build -v ./cmd/car/main.go
+
+  unit_test:
+    name: Unit test
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint app
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+
+      - name: Run unit tests for gateway
+        run: ALLURE_OUTPUT_PATH=../../ go test -v ./internal/gateway
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: allure-results
+
+  publish_test_report:
+    needs: [ unit_test ]
+    name: Publish test report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download current test reports
+        uses: actions/download-artifact@v4
+        with:
+          name: test-reports
+          path: allure-results
+
+      - name: Load test report history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build test report
+        uses: simple-elf/allure-report-action@v1.7
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_history: allure-history
+          allure_results: allure-results
+          keep_reports: 50
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+
+  push_images:
+    needs: [ unit_test ]
+    name: Push images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU for Docker build
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push images
         timeout-minutes: 10
-        run: docker compose build --push
+        run: PIPELINE_ID=${{ github.run_number }} docker compose build --push
 
-      # TODO deploy to k8s with liveness and readyness probes
+  autograding:
+    needs: [ push_images ]
+    name: Deploy to minikube and Autograding
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Start minikube
+        uses: medyagh/setup-minikube@latest
+      
+      - name: Enable the Ingress controller 
+        run: |
+          minikube addons enable ingress
+          kubectl get pods -n ingress-nginx
+
+      - name: Deploy
+        run: |
+          kubectl create namespace test
+          helm upgrade postgres oci://registry-1.docker.io/bitnamicharts/postgresql -f deployments/postgres/values.yaml -n test --install --wait --atomic
+          helm upgrade kafka oci://registry-1.docker.io/bitnamicharts/kafka -f deployments/kafka/values.yaml -n test --install --wait --atomic
+          helm repo add gruntwork https://helmcharts.gruntwork.io
+          helm repo update
+          helm upgrade cars-api gruntwork/k8s-service -f deployments/api-services/cars.yaml -n test --install --wait --atomic
+          helm upgrade rental-api gruntwork/k8s-service -f deployments/api-services/rental.yaml -n test --install --wait --atomic
+          helm upgrade payment-api gruntwork/k8s-service -f deployments/api-services/payment.yaml -n test --install --wait --atomic
+          helm upgrade gateway gruntwork/k8s-service -f deployments/api-services/gateway.yaml -n test --install --wait --atomic
+          helm upgrade retryer gruntwork/k8s-service -f deployments/api-services/retryer.yaml -n test --install --wait --atomic
 
       - name: Wait before services are ready
         run: kubectl wait -n test -l app.kubernetes.io/name=gateway pod --for=condition=Ready --timeout 3m
       
-      # TODO setup parameters in classroom/autograding.json
-      
+      - name: Show all resources in cluster
+        run: |
+          kubectl get all -n test
+          
+      - name: Test service URLs
+        run: | 
+          minikube service list
+          minikube service gateway -n test --url | tee env.tmp
+
+      - name: Add app URL to Postman environment
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: >-
+            jq --arg jq_url $(cat env.tmp) '.values[0].value = $jq_url' < postman/environment.json > out.tmp && 
+            mv out.tmp postman/environment.json && 
+            chmod 777 postman/environment.json
+          
       - name: Autograding
         uses: education/autograding@v1
         continue-on-error: true

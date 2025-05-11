@@ -1,0 +1,14 @@
+logging:
+  level: -4 # -4: debug, 0: info, 4: warn, 8: error
+web:
+  host:
+  port: 8080
+  pathPrefix: /api/v1
+kafka:
+  addresses:
+    - kafka:9092
+  topic: "backlog.requests.http"
+carsApiAddr: http://cars-api:8080
+rentalApiAddr: http://rental-api:8080
+paymentApiAddr: http://payment-api:8080
+maxRequestFails: 1

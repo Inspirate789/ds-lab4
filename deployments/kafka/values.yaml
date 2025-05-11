@@ -1,0 +1,12 @@
+global:
+  security:
+    allowInsecureImages: true
+image:
+  tag: 4.0.0-debian-12-r3
+listeners:
+  client:
+    protocol: PLAINTEXT
+extraInit: |
+  kafka_conf_set "$KAFKA_CONFIG_FILE" "auto.create.topics.enable" "true"
+controller:
+  replicaCount: 1
